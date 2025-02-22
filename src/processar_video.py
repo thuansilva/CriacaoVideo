@@ -8,15 +8,15 @@ def gerar_nome_arquivo():
     Gera um nome de arquivo aleatório curto para o vídeo de saída.
     """
     sufixo = ''.join(random.choices(string.digits + 'abcdef', k=6))
-    return f"output_video_{sufixo}.mp4"
+    return f"{sufixo}"
 
-def detectar_area_ativa(input_video):
+def detectar_area_ativa(video_entrada):
     """
     Aplica corte, redimensiona o vídeo e insere um banner centralizado.
     """
     try:
         result = subprocess.run(
-            ["ffmpeg", "-i", input_video, "-vf", "cropdetect=24:16:0", "-t", "5", "-f", "null", "-"],
+            ["ffmpeg", "-i", video_entrada, "-vf", "cropdetect=24:16:0", "-t", "5", "-f", "null", "-"],
             stderr=subprocess.PIPE, text=True
         )
         
@@ -26,8 +26,8 @@ def detectar_area_ativa(input_video):
         print(f"Erro ao detectar a área ativa do vídeo: {e}")
         return None
 
-def video_com_banner(input_video, banner_image, output_video):
-    crop_values = detectar_area_ativa(input_video)
+def video_com_banner(video_entrada, banner_image: str =  "./banner/banner1.png" , video_saida: str =  f"./video_final/reels_{gerar_nome_arquivo()}.mp4"):
+    crop_values = detectar_area_ativa(video_entrada)
     
     if not crop_values:
         print("Não foi possível detectar a área ativa do vídeo.")
@@ -43,15 +43,15 @@ def video_com_banner(input_video, banner_image, output_video):
     
     try:
         subprocess.run(
-            ["ffmpeg", "-i", input_video, "-i", banner_image, "-filter_complex", filter_complex,
-             "-map", "[out]", "-map", "0:a", "-c:v", "libx264", "-crf", "23", "-preset", "veryfast", "-c:a", "copy", output_video],
+            ["ffmpeg", "-i", video_entrada, "-i", banner_image, "-filter_complex", filter_complex,
+             "-map", "[out]", "-map", "0:a", "-c:v", "libx264", "-crf", "23", "-preset", "veryfast", "-c:a", "copy", video_saida],
             check=True
         )
-        print(f"Processo concluído. Vídeo com áudio salvo em: {output_video}")
+        print(f"Processo concluído. Vídeo com áudio salvo em: {video_saida}")
     except subprocess.CalledProcessError as e:
         print(f"Erro ao processar o vídeo: {e}")
 
-def video_com_bordas_desfocadas(video_entrada, video_saida):
+def video_com_bordas_desfocadas(video_entrada, video_saida: str =  f"./video_final/reels_{gerar_nome_arquivo()}.mp4"):
     """
     Aplica corte, redimensiona o vídeo e adiciona bordas desfocadas.
     """
@@ -70,4 +70,3 @@ def video_com_bordas_desfocadas(video_entrada, video_saida):
     ]
     subprocess.run(comando, check=True)
     print(f"Processo concluído. Vídeo salvo em: {video_saida}")
-
