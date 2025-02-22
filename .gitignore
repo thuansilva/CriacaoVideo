@@ -15,8 +15,12 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-downloads/
-video/
+src/downloads/*.mp4
+src/downloads/*.avi
+src/downloads/*.mov
+src/video_final/*.mp4
+src/video_final/*.avi
+src/video_final/*.mov
 eggs/
 .eggs/
 lib/
